@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Find Accommodations - BookingPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accommodations.css' %}">
+<style>
+    .filter-sidebar {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+    .accommodation-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .accommodation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .price-badge {
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+    }
+    .accommodation-image {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px 10px 0 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Search Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-primary text-white p-4 rounded">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" name="location" class="form-control" 
+                               placeholder="Where are you going?" 
+                               value="{{ current_filters.location }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="check_in_date" class="form-control" 
+                               value="{{ current_filters.check_in_date }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="check_out_date" class="form-control" 
+                               value="{{ current_filters.check_out_date }}">
+                    </div>
+                    <div class="col-md-2">
+                        <select name="num_guests" class="form-control">
+                            <option value="">Guests</option>
+                            {% for i in "12345678" %}
+                            <option value="{{ forloop.counter }}" 
+                                    {% if current_filters.num_guests == forloop.counter|stringformat:"s" %}selected{% endif %}>
+                                {{ forloop.counter }} Guest{{ forloop.counter|pluralize }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-light w-100">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="filter-sidebar">
+                <h5 class="mb-3">
+                    <i class="fas fa-filter me-2"></i>Filters
+                </h5>
+                
+                <form method="get" id="filter-form">
+                    <!-- Preserve search parameters -->
+                    {% if current_filters.location %}
+                    <input type="hidden" name="location" value="{{ current_filters.location }}">
+                    {% endif %}
+                    {% if current_filters.check_in_date %}
+                    <input type="hidden" name="check_in_date" value="{{ current_filters.check_in_date }}">
+                    {% endif %}
+                    {% if current_filters.check_out_date %}
+                    <input type="hidden" name="check_out_date" value="{{ current_filters.check_out_date }}">
+                    {% endif %}
+                    {% if current_filters.num_guests %}
+                    <input type="hidden" name="num_guests" value="{{ current_filters.num_guests }}">
+                    {% endif %}
+                    
+                    <!-- Price Range -->
+                    <div class="mb-4">
+                        <h6>Price Range</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="number" name="min_price" class="form-control form-control-sm" 
+                                       placeholder="Min" value="{{ current_filters.min_price }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" name="max_price" class="form-control form-control-sm" 
+                                       placeholder="Max" value="{{ current_filters.max_price }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Property Type -->
+                    <div class="mb-4">
+                        <h6>Category</h6>
+                        <select name="category" class="form-control form-control-sm">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" 
+                                    {% if current_filters.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Amenities -->
+                    <div class="mb-4">
+                        <h6>Amenities</h6>
+                        {% for amenity in amenities %}
+                        <div class="form-check">
+                            <input type="checkbox" name="amenities" value="{{ amenity.id }}" 
+                                   class="form-check-input" id="amenity-{{ amenity.id }}"
+                                   {% if amenity.id|stringformat:"s" in current_filters.amenities %}checked{% endif %}>
+                            <label class="form-check-label" for="amenity-{{ amenity.id }}">
+                                {{ amenity.name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Sort -->
+                    <div class="mb-4">
+                        <h6>Sort By</h6>
+                        <select name="sort" class="form-control form-control-sm">
+                            <option value="featured" {% if current_filters.sort == 'featured' %}selected{% endif %}>Featured</option>
+                            <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="rating" {% if current_filters.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                            <option value="newest" {% if current_filters.sort == 'newest' %}selected{% endif %}>Newest</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Accommodations Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">
+                    {% if accommodations %}
+                        {{ accommodations|length }}+ Properties Found
+                    {% else %}
+                        No Properties Found
+                    {% endif %}
+                </h4>
+            </div>
+
+            {% if accommodations %}
+            <div class="row">
+                {% for accommodation in accommodations %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card accommodation-card h-100">
+                        <div class="position-relative">
+                            {% if accommodation.images.first %}
+                            <img src="{{ accommodation.images.first.image.url }}" 
+                                 alt="{{ accommodation.title }}" 
+                                 class="card-img-top accommodation-image">
+                            {% else %}
+                            <div class="accommodation-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-home fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="price-badge">
+                                <strong>${{ accommodation.price_per_night }}/night</strong>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h6 class="card-title mb-2">{{ accommodation.title }}</h6>
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {{ accommodation.city }}, {{ accommodation.state }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ accommodation.max_guests }} guests
+                                </div>
+                                <div>
+                                    {% if accommodation.average_rating %}
+                                        <span class="text-warning">
+                                            <i class="fas fa-star"></i>
+                                            {{ accommodation.average_rating|floatformat:1 }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">New</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="card-text small">{{ accommodation.description|truncatewords:15 }}</p>
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'accommodations:detail' accommodation.pk %}" 
+                               class="btn btn-primary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Accommodations pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in page_obj.paginator.page_range %}
+                        {% if page_num == page_obj.number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% elif page_num > page_obj.number|add:'-3' and page_num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No accommodations found</h5>
+                <p class="text-muted">Try adjusting your search criteria</p>
+                <a href="{% url 'accommodations:list' %}" class="btn btn-primary">Clear Filters</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form when filters change
+    const filterForm = document.getElementById('filter-form');
+    const filterInputs = filterForm.querySelectorAll('select, input[type="checkbox"]');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    });
+});
+</script>
+{% endblock %}

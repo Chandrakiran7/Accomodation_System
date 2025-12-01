@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Guest Dashboard - BookingPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .dashboard-card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .booking-card {
+        border-left: 4px solid #007bff;
+    }
+    .text-warning { color: #ffc107 !important; }
+    .text-success { color: #28a745 !important; }
+    .text-danger { color: #dc3545 !important; }
+    .text-info { color: #17a2b8 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">Welcome back, {{ user.first_name }}!</h1>
+                    <p class="text-muted">Manage your bookings and discover new places to stay</p>
+                </div>
+                <div>
+                    <a href="{% url 'accommodations:list' %}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Find Accommodations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Total Bookings</h6>
+                            <h2 class="mb-0">{{ booking_stats.total_bookings }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Upcoming</h6>
+                            <h2 class="mb-0">{{ booking_stats.upcoming_bookings }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Total Spent</h6>
+                            <h2 class="mb-0">${{ spending_stats.total_spent|default:0|floatformat:0 }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Reviews Written</h6>
+                            <h2 class="mb-0">{{ review_stats.reviews_written }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-star fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Current Bookings -->
+        <div class="col-12 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bed me-2 text-primary"></i>Current Stays
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if current_bookings %}
+                        {% for booking in current_bookings %}
+                        <div class="booking-card card mb-3">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6 class="mb-1">{{ booking.accommodation.title }}</h6>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            {{ booking.accommodation.city }}, {{ booking.accommodation.state }}
+                                        </p>
+                                        <small class="text-muted">
+                                            {{ booking.check_in_date }} - {{ booking.check_out_date }}
+                                            ({{ booking.nights }} nights)
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <span class="badge bg-success mb-2">Checked In</span><br>
+                                        <a href="{% url 'bookings:detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-bed fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No current stays</h5>
+                            <p class="text-muted">You don't have any active bookings right now.</p>
+                            <a href="{% url 'accommodations:list' %}" class="btn btn-primary">
+                                Find Your Next Stay
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Bookings -->
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt me-2 text-warning"></i>Upcoming Trips
+                    </h5>
+                    <a href="{% url 'bookings:my_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_bookings %}
+                        {% for booking in upcoming_bookings %}
+                        <div class="d-flex align-items-center mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="me-3">
+                                {% if booking.accommodation.images.first %}
+                                <img src="{{ booking.accommodation.images.first.image.url }}" 
+                                     alt="{{ booking.accommodation.title }}"
+                                     class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-home text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ booking.accommodation.title }}</h6>
+                                <p class="text-muted mb-1 small">
+                                    {{ booking.check_in_date|date:"M j" }} - {{ booking.check_out_date|date:"M j, Y" }}
+                                </p>
+                                <small class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i>Confirmed
+                                </small>
+                            </div>
+                            <div>
+                                <a href="{% url 'bookings:detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                    Details
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No upcoming trips planned</p>
+                            <a href="{% url 'accommodations:list' %}" class="btn btn-sm btn-primary">
+                                Plan Your Next Trip
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Reviews to Write -->
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-star me-2 text-warning"></i>Reviews to Write
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if bookings_to_review %}
+                        {% for booking in bookings_to_review %}
+                        <div class="d-flex align-items-center mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="me-3">
+                                {% if booking.accommodation.images.first %}
+                                <img src="{{ booking.accommodation.images.first.image.url }}" 
+                                     alt="{{ booking.accommodation.title }}"
+                                     class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-home text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ booking.accommodation.title }}</h6>
+                                <small class="text-muted">
+                                    Stayed {{ booking.check_out_date|date:"M j, Y" }}
+                                </small>
+                            </div>
+                            <div>
+                                <a href="{% url 'reviews:create' booking.pk %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-star me-1"></i>Review
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-star fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No reviews to write</p>
+                            <small class="text-muted">Reviews will appear here after completed stays</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Travel Statistics -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-globe me-2 text-info"></i>Your Travel Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="border-end">
+                                <h3 class="text-primary mb-1">{{ travel_stats.cities_visited }}</h3>
+                                <p class="text-muted mb-0">Cities Visited</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="border-end">
+                                <h3 class="text-success mb-1">{{ travel_stats.countries_visited }}</h3>
+                                <p class="text-muted mb-0">Countries Visited</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="border-end">
+                                <h3 class="text-warning mb-1">{{ travel_stats.total_nights }}</h3>
+                                <p class="text-muted mb-0">Nights Stayed</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h3 class="text-info mb-1">${{ spending_stats.average_booking_cost|default:0|floatformat:0 }}</h3>
+                            <p class="text-muted mb-0">Avg. Booking Cost</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add any dashboard-specific JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh booking status every 30 seconds
+    setInterval(function() {
+        // Could add AJAX calls here to update booking statuses
+    }, 30000);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Host Dashboard - BookingPlatform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .dashboard-card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .earning-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    .property-card {
+        border-left: 4px solid #28a745;
+    }
+    .booking-card {
+        border-left: 4px solid #007bff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">Host Dashboard</h1>
+                    <p class="text-muted">Manage your properties and track your earnings</p>
+                </div>
+                <div>
+                    <a href="{% url 'accommodations:create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Add Property
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Total Properties</h6>
+                            <h2 class="mb-0">{{ stats.total_properties }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-home fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Active Properties</h6>
+                            <h2 class="mb-0">{{ stats.active_properties }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card earning-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">Total Revenue</h6>
+                            <h2 class="mb-0">${{ revenue_stats.total_revenue|default:0|floatformat:0 }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-card earning-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title text-uppercase text-white-50">This Month</h6>
+                            <h2 class="mb-0">${{ revenue_stats.this_month_revenue|default:0|floatformat:0 }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Alerts -->
+    {% if upcoming_checkins or upcoming_checkouts %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5 class="alert-heading">
+                    <i class="fas fa-bell me-2"></i>Today's Activity
+                </h5>
+                {% if upcoming_checkins %}
+                    <p class="mb-2">
+                        <strong>Check-ins today:</strong> {{ upcoming_checkins.count }} guest(s) arriving
+                    </p>
+                {% endif %}
+                {% if upcoming_checkouts %}
+                    <p class="mb-0">
+                        <strong>Check-outs today:</strong> {{ upcoming_checkouts.count }} guest(s) departing
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Property Management -->
+        <div class="col-lg-8 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-home me-2 text-success"></i>Your Properties
+                    </h5>
+                    <a href="{% url 'accommodations:create' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus me-1"></i>Add New
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if accommodations %}
+                        {% for accommodation in accommodations|slice:":5" %}
+                        <div class="property-card card mb-3">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        {% if accommodation.images.first %}
+                                        <img src="{{ accommodation.images.first.image.url }}" 
+                                             alt="{{ accommodation.title }}"
+                                             class="img-fluid rounded" style="height: 60px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                             style="height: 60px;">
+                                            <i class="fas fa-home text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-1">{{ accommodation.title }}</h6>
+                                        <p class="text-muted mb-1 small">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            {{ accommodation.city }}, {{ accommodation.state }}
+                                        </p>
+                                        <small class="text-muted">
+                                            ${{ accommodation.price_per_night }}/night • {{ accommodation.max_guests }} guests
+                                        </small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        {% if accommodation.status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% elif accommodation.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <a href="{% url 'accommodations:detail' accommodation.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">View</a>
+                                        <a href="{% url 'accommodations:edit' accommodation.pk %}" 
+                                           class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if accommodations.count > 5 %}
+                        <div class="text-center">
+                            <a href="{% url 'accommodations:list' %}?host={{ user.id }}" class="btn btn-outline-primary">
+                                View All Properties ({{ accommodations.count }})
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-home fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No properties yet</h5>
+                            <p class="text-muted">Add your first property to start earning!</p>
+                            <a href="{% url 'accommodations:create' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>Add Your First Property
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="col-lg-4 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Recent Bookings
+                    </h5>
+                    <a href="{% url 'bookings:host_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_bookings %}
+                        {% for booking in recent_bookings|slice:":5" %}
+                        <div class="d-flex align-items-center mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="me-3">
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ booking.guest.get_full_name }}</h6>
+                                <p class="text-muted mb-1 small">{{ booking.accommodation.title }}</p>
+                                <small class="text-muted">
+                                    {{ booking.check_in_date|date:"M j" }} - {{ booking.check_out_date|date:"M j" }}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                {% if booking.status == 'confirmed' %}
+                                    <span class="badge bg-success mb-1">Confirmed</span>
+                                {% elif booking.status == 'pending' %}
+                                    <span class="badge bg-warning mb-1">Pending</span>
+                                {% elif booking.status == 'completed' %}
+                                    <span class="badge bg-info mb-1">Completed</span>
+                                {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger mb-1">Cancelled</span>
+                                {% endif %}
+                                <br>
+                                <small class="text-success">${{ booking.total_cost }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No bookings yet</p>
+                            <small class="text-muted">Bookings will appear here when guests book your properties</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Stats and Reviews -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2 text-info"></i>Booking Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-1">{{ booking_stats.total_bookings }}</h4>
+                                <p class="text-muted mb-0 small">Total Bookings</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning mb-1">{{ booking_stats.pending_bookings }}</h4>
+                            <p class="text-muted mb-0 small">Pending</p>
+                        </div>
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-success mb-1">{{ booking_stats.confirmed_bookings }}</h4>
+                                <p class="text-muted mb-0 small">Confirmed</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-1">{{ booking_stats.completed_bookings }}</h4>
+                            <p class="text-muted mb-0 small">Completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-star me-2 text-warning"></i>Recent Reviews
+                    </h5>
+                    <span class="badge bg-warning">{{ review_stats.average_rating|floatformat:1 }} ⭐</span>
+                </div>
+                <div class="card-body">
+                    {% if recent_reviews %}
+                        {% for review in recent_reviews|slice:":3" %}
+                        <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>{{ review.guest.get_full_name }}</strong>
+                                <div>
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.overall_rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="text-muted mb-1 small">{{ review.accommodation.title }}</p>
+                            <p class="mb-0">{{ review.comment|truncatewords:15 }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-star fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No reviews yet</p>
+                            <small class="text-muted">Reviews from guests will appear here</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh dashboard data every 2 minutes
+    setInterval(function() {
+        // Could add AJAX calls here to update booking counts
+    }, 120000);
+    
+    // Add tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

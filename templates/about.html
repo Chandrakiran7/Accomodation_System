@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - BookingPlatform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-4">About BookingPlatform</h1>
+            <p class="lead text-muted">Connecting travelers with unique accommodations worldwide</p>
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <h2>Our Mission</h2>
+            <p class="lead">We believe that travel should be personal, authentic, and accessible to everyone.</p>
+            <p>BookingPlatform was created to bridge the gap between travelers seeking unique experiences and hosts who want to share their spaces and cultures. Whether you're looking for a cozy apartment in the heart of a bustling city or a peaceful retreat in nature, we help you find the perfect place to call home during your travels.</p>
+        </div>
+        <div class="col-lg-6">
+            <img src="{% static 'images/about-mission.jpg' %}" alt="Our Mission" class="img-fluid rounded shadow" 
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDUwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNmOGY5ZmEiLz48dGV4dCB4PSIyNTAiIHk9IjE1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM2Yzc1N2QiPk91ciBNaXNzaW9uPC90ZXh0Pjwvc3ZnPg=='">
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2>Why Choose BookingPlatform?</h2>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="text-center">
+                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-home fa-2x text-white"></i>
+                </div>
+                <h4>Unique Accommodations</h4>
+                <p>From cozy apartments to luxurious villas, discover unique places that match your style and budget.</p>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="text-center">
+                <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-shield-alt fa-2x text-white"></i>
+                </div>
+                <h4>Safe & Secure</h4>
+                <p>All hosts and properties are verified. Your safety and security are our top priorities.</p>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="text-center">
+                <div class="bg-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-headset fa-2x text-white"></i>
+                </div>
+                <h4>24/7 Support</h4>
+                <p>Our customer support team is available around the clock to help with any questions or concerns.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row mb-5 text-center">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h2 class="text-primary">10K+</h2>
+                    <p class="text-muted">Properties Listed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h2 class="text-success">50K+</h2>
+                    <p class="text-muted">Happy Guests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h2 class="text-warning">100+</h2>
+                    <p class="text-muted">Countries</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h2 class="text-info">4.8</h2>
+                    <p class="text-muted">Average Rating</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2>Our Values</h2>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <h4><i class="fas fa-heart text-danger me-2"></i>Community First</h4>
+            <p>We believe in building strong relationships between hosts and guests, creating a global community of travelers.</p>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <h4><i class="fas fa-leaf text-success me-2"></i>Sustainable Travel</h4>
+            <p>We promote responsible tourism that benefits local communities and preserves the environment.</p>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <h4><i class="fas fa-globe text-primary me-2"></i>Global Connection</h4>
+            <p>Breaking down barriers and connecting people from different cultures through authentic travel experiences.</p>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="bg-light rounded p-5">
+                <h2 class="mb-4">Ready to Start Your Journey?</h2>
+                <p class="lead mb-4">Join thousands of travelers who have found their perfect stay with BookingPlatform</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'accommodations:list' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search me-2"></i>Find Accommodations
+                    </a>
+                    <a href="{% url 'accounts:register' %}?role=host" class="btn btn-success btn-lg">
+                        <i class="fas fa-home me-2"></i>Become a Host
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

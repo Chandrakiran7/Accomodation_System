@@ -1,0 +1,157 @@
+/* Dashboard Styles */
+.dashboard-card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 10px;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+}
+
+.earning-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 15px;
+}
+
+.property-card {
+    border-left: 4px solid #28a745;
+}
+
+.booking-card {
+    border-left: 4px solid #007bff;
+}
+
+.filter-sidebar {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.accommodation-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.accommodation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.price-badge {
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    font-weight: bold;
+}
+
+.accommodation-image {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.profile-image {
+    width: 120px;
+    height: 120px;
+    border: 4px solid white;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+    
+    .profile-header {
+        padding: 2rem 0;
+        text-align: center !important;
+    }
+    
+    .accommodation-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animation for loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button improvements */
+.btn-outline-primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn-outline-success:hover {
+    transform: translateY(-1px);
+}
+
+/* Card improvements */
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.text-warning { color: #ffc107 !important; }
+.text-success { color: #28a745 !important; }
+.text-danger { color: #dc3545 !important; }
+.text-info { color: #17a2b8 !important; }
+
+/* Sticky elements */
+.sticky-top {
+    top: 20px;
+}
+
+/* Form improvements */
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* Footer improvements */
+.footer {
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    margin-top: 2rem;
+}

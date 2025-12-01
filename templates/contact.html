@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - BookingPlatform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-4">Get in Touch</h1>
+            <p class="lead text-muted">We're here to help with any questions about your booking or hosting experience</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-envelope me-2"></i>Send us a Message
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone (Optional)</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select class="form-control" id="subject" required>
+                                <option value="">Select a topic</option>
+                                <option value="booking">Booking Support</option>
+                                <option value="hosting">Hosting Questions</option>
+                                <option value="payment">Payment Issues</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" 
+                                      placeholder="Please describe your question or concern..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Contact Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6><i class="fas fa-envelope text-primary me-2"></i>Email</h6>
+                        <p class="text-muted mb-0">support@bookingplatform.com</p>
+                        <small class="text-muted">We typically respond within 24 hours</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-phone text-success me-2"></i>Phone</h6>
+                        <p class="text-muted mb-0">+1 (555) 123-4567</p>
+                        <small class="text-muted">Monday - Friday, 9AM - 6PM EST</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-map-marker-alt text-danger me-2"></i>Address</h6>
+                        <p class="text-muted mb-0">
+                            123 Travel Street<br>
+                            San Francisco, CA 94102<br>
+                            United States
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Links -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Quick Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary text-start">
+                            <i class="fas fa-search me-2"></i>How to Book
+                        </a>
+                        <a href="#" class="btn btn-outline-success text-start">
+                            <i class="fas fa-home me-2"></i>How to Host
+                        </a>
+                        <a href="#" class="btn btn-outline-info text-start">
+                            <i class="fas fa-credit-card me-2"></i>Payment Help
+                        </a>
+                        <a href="#" class="btn btn-outline-warning text-start">
+                            <i class="fas fa-times-circle me-2"></i>Cancellation Policy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Support Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="bg-light rounded p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h3>Need Immediate Help?</h3>
+                        <p class="mb-0">For urgent booking issues or emergencies during your stay, contact our 24/7 support line.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <a href="tel:+15551234567" class="btn btn-danger btn-lg">
+                            <i class="fas fa-phone me-2"></i>Emergency Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle contact form submission
+    const contactForm = document.querySelector('form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message (in a real app, this would submit to a server)
+            alert('Thank you for your message! We will get back to you within 24 hours.');
+            
+            // Reset form
+            this.reset();
+        });
+    }
+});
+</script>
+{% endblock %}
