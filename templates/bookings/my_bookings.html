@@ -14,6 +14,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">{{ booking.accommodation.title }}</h5>
+
                     <p class="card-text">
                         <strong>Check-in:</strong> {{ booking.check_in_date }}<br>
                         <strong>Check-out:</strong> {{ booking.check_out_date }}<br>
@@ -23,14 +24,50 @@
                             {{ booking.get_status_display|default:booking.status }}
                         </span>
                     </p>
-                    <a href="{% url 'accommodations:detail' booking.accommodation.pk %}" class="btn btn-primary">
-                        View Property
+
+                    <!-- ✅ VIEW (GUEST + HOST) -->
+                    <a href="{% url 'bookings:detail' booking.pk %}" 
+                       class="btn btn-primary btn-sm">
+                        View Booking
                     </a>
+
+                    <!-- ✅ GUEST: EDIT + DELETE (ONLY PENDING) -->
+                    {% if request.user == booking.guest and booking.status == "pending" %}
+                        <a href="{% url 'bookings:edit' booking.pk %}" 
+                           class="btn btn-warning btn-sm ms-2">
+                           Edit
+                        </a>
+
+                        <a href="{% url 'bookings:delete' booking.pk %}" 
+                           class="btn btn-danger btn-sm ms-2"
+                           onclick="return confirm('Are you sure you want to delete this booking?');">
+                           Delete
+                        </a>
+                    {% endif %}
+
+                    <!-- ✅ HOST: CONFIRM + REJECT (ONLY PENDING) -->
+                    {% if request.user == booking.accommodation.host and booking.status == "pending" %}
+                        <form method="post" action="{% url 'bookings:confirm' booking.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm ms-2">
+                                Confirm
+                            </button>
+                        </form>
+
+                        <form method="post" action="{% url 'bookings:reject' booking.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm ms-2">
+                                Reject
+                            </button>
+                        </form>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    
     {% else %}
     <div class="text-center py-5">
         <i class="fas fa-calendar fa-3x text-muted mb-3"></i>

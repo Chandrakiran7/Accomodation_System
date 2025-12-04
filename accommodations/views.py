@@ -128,9 +128,40 @@ class AccommodationDetailView(DetailView):
         ).exclude(pk=accommodation.pk)[:3]
         
         return context
-
+from django.urls import reverse_lazy
+from django.contrib import messages
+from .forms import AccommodationForm
 
 class AccommodationCreateView(LoginRequiredMixin, CreateView):
+    model = Accommodation
+    form_class = AccommodationForm
+    template_name = 'accommodations/create.html'
+    success_url = reverse_lazy('accommodations:list')  # ✅ safer than host_dashboard
+
+    def form_valid(self, form):
+        property = form.save(commit=False)
+        property.host = self.request.user
+        property.status = 'active'   # ✅ REQUIRED FIX
+        property.is_available = True  # ✅ IF THIS FIELD EXISTS
+        property.save()
+
+        messages.success(self.request, "✅ Property added successfully!")
+        return redirect(self.success_url)
+
+
+'''class AccommodationCreateView(LoginRequiredMixin, CreateView):
+    model = Accommodation
+    form_class = AccommodationForm
+    template_name = 'accommodations/create.html'
+    success_url = reverse_lazy('host_dashboard')  # ✅ or 'user_dashboard'
+
+    def form_valid(self, form):
+        form.instance.host = self.request.user
+        messages.success(self.request, "✅ Property added successfully!")
+        return super().form_valid(form)   # ✅ THIS LINE IS THE KEY
+'''
+
+'''class AccommodationCreateView(LoginRequiredMixin, CreateView):
     """Create view for new accommodation (hosts only)"""
     model = Accommodation
     form_class = AccommodationForm
@@ -150,7 +181,7 @@ class AccommodationCreateView(LoginRequiredMixin, CreateView):
             self.request, 
             'Your accommodation has been submitted for review. We\'ll notify you once it\'s approved.'
         )
-        return super().form_valid(form)
+        return super().form_valid(form)'''
 
 
 class AccommodationUpdateView(LoginRequiredMixin, UpdateView):

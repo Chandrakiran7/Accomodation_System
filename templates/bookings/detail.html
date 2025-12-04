@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Booking Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <h2 class="mb-4">Booking Details</h2>
+
+    <div class="card">
+        <div class="card-body">
+
+            <h5>{{ booking.accommodation.title }}</h5>
+
+            <p>
+                <strong>Check-in:</strong> {{ booking.check_in_date }} <br>
+                <strong>Check-out:</strong> {{ booking.check_out_date }} <br>
+                <strong>Guests:</strong> {{ booking.num_guests }} <br>
+                <strong>Status:</strong> {{ booking.status }} <br>
+                
+            </p>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

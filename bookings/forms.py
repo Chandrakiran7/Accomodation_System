@@ -1,8 +1,43 @@
 from django import forms
 from .models import Booking, BookingMessage, Payment
+from django import forms
+from .models import Booking
 
 
 class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = [
+            'check_in_date',
+            'check_out_date',
+            'num_guests',
+            'special_requests'
+        ]
+
+        widgets = {
+            'check_in_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+            'check_out_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
+            'num_guests': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+            }),
+
+            # ✅ ✅ THIS IS THE CRITICAL FIX ✅ ✅
+            'special_requests': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Any special requests? (optional)',
+            }),
+        }
+
+
+
+'''class BookingForm(forms.ModelForm):
     """Form for creating bookings"""
     
     class Meta:
@@ -24,12 +59,11 @@ class BookingForm(forms.ModelForm):
                 'class': 'form-control',
                 'min': 1
             }),
-            'special_requests': forms.Textarea(attrs={
+            'special_requests': forms.Textinput(attrs={
                 'class': 'form-control',
-                'rows': 4,
                 'placeholder': 'Any special requests? (optional)'
             }),
-        }
+        }'''
     
     def __init__(self, *args, **kwargs):
         self.accommodation = kwargs.pop('accommodation', None)

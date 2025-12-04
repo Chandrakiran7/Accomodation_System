@@ -1,9 +1,9 @@
+from accommodations.models import Accommodation
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DetailView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -13,181 +13,189 @@ from decimal import Decimal
 from .models import Booking
 
 
+# ✅ CREATE BOOKING
 class BookingCreateView(LoginRequiredMixin, CreateView):
-    """Create a new booking"""
     model = Booking
-    template_name = 'bookings/create.html'
+    template_name = 'bookings/createbooking.html'
     fields = ['check_in_date', 'check_out_date', 'num_guests', 'special_requests']
-    
+
+    def dispatch(self, request, *args, **kwargs):
+        self.accommodation = get_object_or_404(
+            Accommodation, pk=self.kwargs['accommodation_id']
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['check_in_date'] = self.request.GET.get('check_in')
+        initial['check_out_date'] = self.request.GET.get('check_out')
+        initial['num_guests'] = self.request.GET.get('guests')
+        return initial
+
     def form_valid(self, form):
-        messages.success(self.request, 'Booking created successfully!')
-        return super().form_valid(form)
+        booking = form.save(commit=False)
+        booking.guest = self.request.user
+        booking.accommodation = self.accommodation
+
+        nights = (booking.check_out_date - booking.check_in_date).days
+        accommodation_cost = nights * self.accommodation.price_per_night
+
+        booking.accommodation_cost = accommodation_cost
+        booking.total_cost = accommodation_cost
+        booking.status = 'pending'
+        booking.save()
+
+        messages.success(self.request, "✅ Booking created successfully!")
+        return redirect("bookings:my_bookings")
 
 
+# ✅ BOOKING DETAIL
 class BookingDetailView(LoginRequiredMixin, DetailView):
-    """View booking details"""
     model = Booking
-    template_name = 'bookings/detail.html'
-    context_object_name = 'booking'
+    template_name = "bookings/detail.html"
+    context_object_name = "booking"
 
 
-class BookingConfirmView(LoginRequiredMixin, UpdateView):
-    """Confirm booking"""
-    model = Booking
-    template_name = 'bookings/confirm.html'
-    fields = []
-
-
-class BookingCancelView(LoginRequiredMixin, UpdateView):
-    """Cancel booking"""
-    model = Booking
-    template_name = 'bookings/cancel.html'
-    fields = []
-
-
+# ✅ GUEST BOOKINGS LIST
 class MyBookingsView(LoginRequiredMixin, ListView):
-    """List user's bookings"""
     model = Booking
-    template_name = 'bookings/my_bookings.html'
-    context_object_name = 'bookings'
-    
+    template_name = "bookings/my_bookings.html"
+    context_object_name = "bookings"
+
     def get_queryset(self):
-        return Booking.objects.filter(guest=self.request.user).order_by('-created_at')
+        return Booking.objects.filter(
+            guest=self.request.user
+        ).order_by("-created_at")
 
 
+# ✅ HOST BOOKINGS
 @login_required
 def host_bookings(request):
-    """List bookings for host's properties"""
-    if request.user.role != 'host':
-        messages.error(request, 'Access denied. You must be a host to view this page.')
-        return redirect('accounts:profile')
-    
-    from accommodations.models import Accommodation
-    
+    if request.user.role != "host":
+        messages.error(request, "Access denied.")
+        return redirect("accounts:profile")
+
     bookings = Booking.objects.filter(
         accommodation__host=request.user
-    ).select_related(
-        'guest', 'accommodation'
-    ).order_by('-created_at')
-    
-    # Filter by status if requested
-    status_filter = request.GET.get('status')
-    if status_filter and status_filter in ['pending', 'confirmed', 'checked_in', 'completed', 'cancelled']:
-        bookings = bookings.filter(status=status_filter)
-    
-    paginator = Paginator(bookings, 15)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'bookings': page_obj,
-        'status_filter': status_filter,
-        'status_counts': {
-            'all': Booking.objects.filter(accommodation__host=request.user).count(),
-            'pending': Booking.objects.filter(accommodation__host=request.user, status='pending').count(),
-            'confirmed': Booking.objects.filter(accommodation__host=request.user, status='confirmed').count(),
-            'completed': Booking.objects.filter(accommodation__host=request.user, status='completed').count(),
-            'cancelled': Booking.objects.filter(accommodation__host=request.user, status='cancelled').count(),
-        }
-    }
-    
-    return render(request, 'bookings/host_bookings.html', context)
+    ).select_related("guest", "accommodation").order_by("-created_at")
+
+    return render(request, "bookings/my_bookings.html", {"bookings": bookings})
 
 
+# ✅ EDIT BOOKING (GUEST ONLY) ✅ FIXED DATE BUG
+@login_required
+def edit_booking(request, pk):
+    booking = get_object_or_404(Booking, pk=pk)
+
+    if request.user != booking.guest:
+        messages.error(request, "You are not allowed to edit this booking.")
+        return redirect("bookings:my_bookings")
+
+    if booking.status != "pending":
+        messages.error(request, "Only pending bookings can be edited.")
+        return redirect("bookings:my_bookings")
+
+    if request.method == "POST":
+        booking.check_in_date = datetime.strptime(
+            request.POST.get("check_in_date"), "%Y-%m-%d"
+        ).date()
+
+        booking.check_out_date = datetime.strptime(
+            request.POST.get("check_out_date"), "%Y-%m-%d"
+        ).date()
+
+        booking.num_guests = request.POST.get("num_guests")
+        booking.special_requests = request.POST.get("special_requests")
+        booking.save()
+
+        messages.success(request, "✅ Booking updated successfully.")
+        return redirect("bookings:my_bookings")
+
+    return render(request, "bookings/edit_booking.html", {"booking": booking})
+
+
+# ✅ DELETE BOOKING (GUEST ONLY)
+@login_required
+def delete_booking(request, pk):
+    booking = get_object_or_404(Booking, pk=pk)
+
+    if request.user != booking.guest:
+        messages.error(request, "You are not allowed to delete this booking.")
+        return redirect("bookings:my_bookings")
+
+    booking.delete()
+    messages.success(request, "✅ Booking deleted successfully.")
+    return redirect("bookings:my_bookings")
+
+
+# ✅ HOST CONFIRM BOOKING
+@login_required
+@require_http_methods(["POST"])
+def confirm_booking(request, pk):
+    booking = get_object_or_404(Booking, pk=pk)
+
+    if request.user != booking.accommodation.host:
+        messages.error(request, "Only the host can confirm this booking.")
+        return redirect("bookings:my_bookings")
+
+    booking.status = "confirmed"
+    booking.save()
+
+    messages.success(request, "✅ Booking confirmed successfully.")
+    return redirect("bookings:my_bookings")
+
+
+# ✅ HOST REJECT BOOKING
+@login_required
+@require_http_methods(["POST"])
+def reject_booking(request, pk):
+    booking = get_object_or_404(Booking, pk=pk)
+
+    if request.user != booking.accommodation.host:
+        messages.error(request, "Only the host can reject this booking.")
+        return redirect("bookings:my_bookings")
+
+    booking.status = "cancelled"
+    booking.save()
+
+    messages.success(request, "✅ Booking rejected successfully.")
+    return redirect("bookings:my_bookings")
+
+
+# ✅ AJAX AVAILABILITY CHECK
 @login_required
 @require_http_methods(["POST"])
 def check_availability(request):
-    """AJAX endpoint to check accommodation availability"""
-    from accommodations.models import Accommodation
-    
-    accommodation_id = request.POST.get('accommodation_id')
-    check_in = request.POST.get('check_in_date')
-    check_out = request.POST.get('check_out_date')
-    
+    accommodation_id = request.POST.get("accommodation_id")
+    check_in = request.POST.get("check_in_date")
+    check_out = request.POST.get("check_out_date")
+
     try:
         accommodation = Accommodation.objects.get(
-            pk=accommodation_id,
-            status='active',
-            is_available=True
+            pk=accommodation_id, status="active", is_available=True
         )
-        
-        check_in_date = datetime.strptime(check_in, '%Y-%m-%d').date()
-        check_out_date = datetime.strptime(check_out, '%Y-%m-%d').date()
-        
-        if check_in_date >= check_out_date:
-            return JsonResponse({
-                'available': False,
-                'message': 'Check-out date must be after check-in date'
-            })
-        
-        if check_in_date < timezone.now().date():
-            return JsonResponse({
-                'available': False,
-                'message': 'Check-in date cannot be in the past'
-            })
-        
-        # Check for overlapping bookings
-        overlapping_bookings = Booking.objects.filter(
+
+        check_in_date = datetime.strptime(check_in, "%Y-%m-%d").date()
+        check_out_date = datetime.strptime(check_out, "%Y-%m-%d").date()
+
+        overlapping = Booking.objects.filter(
             accommodation=accommodation,
-            status__in=['confirmed', 'checked_in'],
+            status__in=["confirmed", "checked_in"],
             check_in_date__lt=check_out_date,
-            check_out_date__gt=check_in_date
+            check_out_date__gt=check_in_date,
         )
-        
-        if overlapping_bookings.exists():
-            return JsonResponse({
-                'available': False,
-                'message': 'This accommodation is not available for the selected dates'
-            })
-        
-        # Calculate pricing
+
+        if overlapping.exists():
+            return JsonResponse({"available": False})
+
         nights = (check_out_date - check_in_date).days
         accommodation_cost = nights * accommodation.price_per_night
-        cleaning_fee = accommodation.cleaning_fee or 0
-        service_fee = accommodation_cost * Decimal('0.10')
-        taxes = (accommodation_cost + service_fee) * Decimal('0.08')
-        total_cost = accommodation_cost + cleaning_fee + service_fee + taxes
-        
+        total_cost = accommodation_cost
+
         return JsonResponse({
-            'available': True,
-            'pricing': {
-                'nights': nights,
-                'accommodation_cost': float(accommodation_cost),
-                'cleaning_fee': float(cleaning_fee),
-                'service_fee': float(service_fee),
-                'taxes': float(taxes),
-                'total_cost': float(total_cost),
-            }
-        })
-    
-    except (Accommodation.DoesNotExist, ValueError):
-        return JsonResponse({
-            'available': False,
-            'message': 'Invalid accommodation or dates'
+            "available": True,
+            "total_cost": float(total_cost)
         })
 
-
-@login_required
-@require_http_methods(["POST"])
-def send_booking_message(request, pk):
-    """Send message related to booking"""
-    booking = get_object_or_404(Booking, pk=pk)
-    
-    # Check permissions
-    if request.user not in [booking.guest, booking.accommodation.host]:
-        return JsonResponse({'success': False, 'message': 'Permission denied'})
-    
-    message_text = request.POST.get('message', '').strip()
-    if not message_text:
-        return JsonResponse({'success': False, 'message': 'Message cannot be empty'})
-    
-    # For now, just return success - implement message model if needed
-    return JsonResponse({
-        'success': True,
-        'message': 'Message sent successfully',
-        'message_data': {
-            'sender': request.user.get_full_name(),
-            'message': message_text,
-            'created_at': timezone.now().strftime('%Y-%m-%d %H:%M')
-        }
-    })
+    except:
+        return JsonResponse({"available": False})

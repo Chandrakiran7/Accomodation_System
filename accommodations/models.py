@@ -88,7 +88,9 @@ class Accommodation(models.Model):
     # Availability
     min_nights = models.PositiveIntegerField(default=1)
     max_nights = models.PositiveIntegerField(default=365)
-    advance_booking_days = models.PositiveIntegerField(default=1)
+    advance_booking_days = models.PositiveIntegerField(default=1, blank=True)
+
+    #advance_booking_days = models.PositiveIntegerField(default=1)
     
     # Features
     amenities = models.ManyToManyField(Amenity, blank=True)

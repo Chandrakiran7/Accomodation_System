@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Create Your Booking</h2>
+
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 800px;">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Check-in Date</label>
+                    <input type="date" name="check_in_date" class="form-control"
+                           value="{{ request.GET.check_in }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Check-out Date</label>
+                    <input type="date" name="check_out_date" class="form-control"
+                           value="{{ request.GET.check_out }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Number of Guests</label>
+                <input type="number" name="num_guests" class="form-control"
+                       min="1" value="{{ request.GET.guests|default:1 }}">
+            </div>
+
+            <!-- ✅ ✅ SPECIAL REQUESTS — NOW FORCED AS ONE LINE -->
+            <div class="mb-4">
+                <label class="form-label">Special Requests</label>
+                <input type="text" name="special_requests"
+                       class="form-control"
+                       placeholder="Any special requests? (optional)">
+            </div>
+
+            <button type="submit" class="btn w-100 text-white" style="background:#198754;">
+                ✅ Create Booking
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

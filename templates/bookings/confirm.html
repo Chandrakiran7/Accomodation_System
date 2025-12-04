@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+
+    <h3>Confirm Booking</h3>
+    <p>Are you sure you want to confirm this booking?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Confirm</button>
+    </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Cancel Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+
+    <h3>Cancel Booking</h3>
+    <p>Are you sure you want to cancel this booking?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Cancel Booking</button>
+    </form>
+
+</div>
+{% endblock %}
