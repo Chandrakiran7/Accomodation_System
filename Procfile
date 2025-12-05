@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:8000 booking_platform.wsgi:application
+web: gunicorn booking_platform.wsgi:application --bind 0.0.0.0:8000
