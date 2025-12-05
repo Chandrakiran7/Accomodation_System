@@ -18,3 +18,4 @@ djangorestframework==3.14.0
 pycparser==2.21
 python-dateutil==2.9.0.post0
 urllib3==2.1.0
+
