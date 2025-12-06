@@ -11,9 +11,9 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 
 ALLOWED_HOSTS = [
-    "accommodation-env.eba-ksjadvrf.us-east-1.elasticbeanstalk.com",
-    "localhost",
-    "127.0.0.1"
+    '.elasticbeanstalk.com',
+    'localhost',
+    '127.0.0.1'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
