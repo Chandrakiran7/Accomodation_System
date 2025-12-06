@@ -26,6 +26,12 @@ jobs:
       run: |
         python manage.py check
 
+    # ✅ NEW STEP: ZIP THE APPLICATION
+    - name: Create deployment package
+      run: |
+        zip -r deploy.zip . -x "*.git*"
+
+    # ✅ FIXED DEPLOY STEP
     - name: Deploy to Elastic Beanstalk (CD)
       uses: einaregilsson/beanstalk-deploy@v21
       with:
@@ -36,5 +42,5 @@ jobs:
         environment_name: projectbooking-env
         region: us-east-1
         version_label: ${{ github.run_number }}
-        deployment_package: .
+        deployment_package: deploy.zip
 
