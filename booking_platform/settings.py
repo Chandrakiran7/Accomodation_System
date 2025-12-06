@@ -27,8 +27,8 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://20535079b3384de085c366b741a0418a.vfs.cloud9.us-east-1.amazonaws.com",
+CSRF_TRUSTED_ORIGINS = ["https://*.vfs.cloud9.us-east-1.amazonaws.com",
+    "https://c0cd880414e64438b87e1e84ec1236a7.vfs.cloud9.us-east-1.amazonaws.com/",
 ]
 # Application definition
 
@@ -140,8 +140,9 @@ STATICFILES_DIRS = [
 ]
 
 # Media files
+DEBUG = True
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR / 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
