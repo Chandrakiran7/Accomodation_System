@@ -13,7 +13,8 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = [
     '.elasticbeanstalk.com',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    'c0cd880414e64438b87e1e84ec1236a7.vfs.cloud9.us-east-1.amazonaws.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -93,19 +94,15 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
-# STATIC FILES
+#static files
 STATIC_URL = '/static/'
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
