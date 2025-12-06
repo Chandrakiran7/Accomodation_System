@@ -1,12 +1,14 @@
 from pathlib import Path
 from decouple import config
+
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
-SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
+DEBUG = config("DEBUG", default=False, cast=bool)
+
 
 ALLOWED_HOSTS = [
     "accommodation-env.eba-ksjadvrf.us-east-1.elasticbeanstalk.com",
