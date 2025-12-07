@@ -76,11 +76,13 @@ g_platform/
 
 
 #Data
+#Host
 username: mariahost
 email': maria.host@example.com
 password :password123
 
-Data Gust
+#Data 
+Guest
 username: davidguest
 email: david.guest@example.com
 password :password123
