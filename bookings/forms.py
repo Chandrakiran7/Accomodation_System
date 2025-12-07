@@ -37,34 +37,6 @@ class BookingForm(forms.ModelForm):
 
 
 
-'''class BookingForm(forms.ModelForm):
-    """Form for creating bookings"""
-    
-    class Meta:
-        model = Booking
-        fields = [
-            'check_in_date', 'check_out_date', 'num_guests', 
-            'guest_names', 'special_requests'
-        ]
-        widgets = {
-            'check_in_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            }),
-            'check_out_date': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            }),
-            'num_guests': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1
-            }),
-            'special_requests': forms.Textinput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Any special requests? (optional)'
-            }),
-        }'''
-    
     def __init__(self, *args, **kwargs):
         self.accommodation = kwargs.pop('accommodation', None)
         super().__init__(*args, **kwargs)

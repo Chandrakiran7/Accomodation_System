@@ -73,13 +73,17 @@ g_platform/
 - **Platform**: AWS
 - **Services**: EC2, RDS, S3, CloudFront
 
-## Admin Access
-- URL: http://localhost:8000/admin/
-- Username: admin
-- Password: admin123
 
-## API Documentation
-REST API endpoints will be available at http://localhost:8000/api/
+
+#Data
+username: mariahost
+email': maria.host@example.com
+password :password123
+
+Data Gust
+username: davidguest
+email: david.guest@example.com
+password :password123
 
 ## License
 MIT License
